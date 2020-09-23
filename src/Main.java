@@ -3,15 +3,38 @@ import money.CurrencyType;
 import money.Money;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Main {
-    public static void main(String... args) throws IOException, IncorrectFormatException {
+    public static void main(String... args) throws IOException, IncorrectFormatException, ParseException {
         List<MonetaryOperation> operations = new FileParser("input.txt").readAllOperations();
-        showStatsTime(operations);
+        Analyzer analyzer = new Analyzer(operations);
+        showSumPerDay(analyzer);
+    }
+
+    private static void showSumPerDay(Analyzer analyzer) {
+        Map<Date, Map<CurrencyType, Double>> sumPerDay = analyzer.getSumPerDay();
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yy");
+        for (Date date: sumPerDay.keySet()) {
+            System.out.println("    " + dateFormat.format(date));
+            showMoneyByCurrencyType(sumPerDay.get(date));
+            System.out.println();
+        }
+    }
+
+    private static void showMoneyByCurrencyType(Map<CurrencyType, Double> moneyByCurrencyType) {
+        for (CurrencyType currencyType: moneyByCurrencyType.keySet()) {
+            System.out.print(currencyType);
+            System.out.print(": ");
+            System.out.print(moneyByCurrencyType.get(currencyType));
+            System.out.print(", ");
+        }
     }
 
     private static void showOperations(List<MonetaryOperation> operations) {
